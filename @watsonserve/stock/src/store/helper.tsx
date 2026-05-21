@@ -1,6 +1,6 @@
 import { useCallback, useReducer, useRef } from 'react';
-import { loadUsr, loadHandles, loadGain } from '@/api';
-import { IROR, ISumInfo, IViewData } from '@/entities';
+import { loadUsr, loadHandles as __loadHandles, loadRR, loadCalendar } from '@/api';
+import { IROR, IState, ISumInfo, IViewData } from '@/entities';
 import { comput } from '@/helpers/ror';
 
 interface IDetail {
@@ -42,7 +42,7 @@ class RInfoMgr {
     let ror = this.__rorCache[tag];
     const [start, end] = this.getTimeSegment(tag);
     if (!ror) {
-      ror = await loadGain(start, end);
+      ror = await loadRR(start, end);
       this.__rorCache[tag] = ror;
     }
     const { lastDivDate, ..._info } = comput(start, end, currency, ror);
@@ -69,7 +69,7 @@ class RInfoMgr {
   async loadHandles() {
     const today = this.today;
     const recently = today + 60 * 86400;
-    const [result, rInfo] = await Promise.all([loadHandles(), this.getRInfo('TY', 'USD')]);
+    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('TY', 'USD')]);
     const { fxs, stocks: _stocks, totalUSDAsset, totalUSDCost } = result;
 
     const stocks: IViewData[] = [];
@@ -82,10 +82,7 @@ class RInfoMgr {
 
       dividend.forEach(item => {
         const { ex, paid } = item;
-        if ('00005' === nc) {
-          console.log(new Date(ex * 1000).toJSON(), new Date(paid * 1000).toJSON());
-        }
-        if (today < ex && ex < recently || today < paid && paid < recently)
+        if (today <= ex && ex < recently || today <= paid && paid < recently)
           recentlyDividends.push({ ...item, nc, ex, paid });
       });
 
@@ -124,7 +121,7 @@ function comingDividends(stocks: IViewData[], recentlyDividends: any[], lastDivD
   .sort((a, b) => a.paid.localeCompare(b.paid))
   .map(item => {
     const { nc, paid, currency, amount } = item;
-    return `${paid} ${nc} ${currency} ${amount}`;
+    return `${paid}\t${nc}\t${currency.substring(0, 2)}$ ${amount}`;
   });
 }
 
@@ -139,7 +136,8 @@ export function useData() {
       currency: 'USD',
       dateSeg: 'TY',
       sumInfo: {} as ISumInfo,
-    }
+      holidays: []
+    } as IState
   );
 
   const changeGain = useCallback(async (tSeg: string, currency = 'USD') => {
@@ -159,5 +157,37 @@ export function useData() {
     loadUsr().then(usr => usr && dispatch({ usr }));
   }, []);
 
-  return { state, loadUser, initial, changeGain };
+  const loadCalendarTips = useCallback(async () => {
+    const list = await loadCalendar();
+    const holidays = [] as any[];
+
+    for (const item of list) {
+      const { market, title, start, end } = item;
+      const startDate = new Date(start * 1000);
+      const endDate = new Date(end * 1000 - 86400000);
+      const afterOne = holidays[0];
+      const strStart = startDate.toJSON().substring(0, 10);
+      const strEnd = endDate.toJSON().substring(0, 10);
+      const desc = strStart === strEnd ? strStart : `${strStart} ~ ${strEnd}`;
+
+      if (afterOne && afterOne.start <= end) {
+        Object.assign(afterOne, {
+          start: start,
+          end: Math.max(end, afterOne.end),
+          title: `${title} & ${afterOne.title}`,
+          desc: `${market}: ${desc}; ${afterOne.desc}`
+        });
+        continue;
+      }
+
+      holidays.unshift({
+        start, end, title,
+        desc: `${market}: ${desc}`
+      });
+    }
+
+    dispatch({ holidays });
+  }, []);
+
+  return { state, loadUser, initial, loadCalendarTips, changeGain };
 }

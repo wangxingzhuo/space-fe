@@ -5,7 +5,7 @@ import DataTable from '@/components/data-table';
 import classes from '@/components/data-table/index.module.styl';
 
 export default function Records() {
-  const headerFileds = ['ttime', 'nc', 'count', 'cost'];
+  const headerFileds = ['ttime', 'nc', 'cost', 'count', 'realise'];
   const [data, setData] = useState<IDataFiled[][]>([]);
 
   const loadData = async () => {

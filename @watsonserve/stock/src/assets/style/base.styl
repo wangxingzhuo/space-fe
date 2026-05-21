@@ -53,7 +53,7 @@ a[disabled] button[disabled] {
   cursor: default;
 }
 
-#root {
+:root {
   color: var(--font-color);
 }
 
@@ -69,12 +69,22 @@ a[disabled] button[disabled] {
   line-height: 24px;
 }
 
-#root .some-button {
+.app .some-button {
+  border-radius: 4px;
   padding: 2px 4px;
   user-select: none;
 
+  &.primary {
+    background-color: var(--active-cursor-color);
+  }
+
   &.active {
     background-color: var(--active-cursor-color);
+  }
+
+  &.large {
+    padding: 8px 16px;
+    font-size: 16px;
   }
 }
 

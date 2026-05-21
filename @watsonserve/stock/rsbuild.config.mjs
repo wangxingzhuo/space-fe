@@ -1,3 +1,4 @@
+import path from 'path';
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginStylus } from '@rsbuild/plugin-stylus';
@@ -5,10 +6,17 @@ import { pluginNodePolyfill } from '@rsbuild/plugin-node-polyfill';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
 
 export default defineConfig({
+  html: {
+    template: path.join(import.meta.dirname, 'public', 'index.html'),
+  },
   output: {
     distPath: 'stock'
   },
-  plugins: [pluginReact(), pluginStylus(), pluginNodePolyfill(), pluginSvgr()],
+  plugins: [pluginReact(), pluginStylus(), pluginNodePolyfill(), pluginSvgr({
+    svgrOptions: {
+      exportType: 'default',
+    },
+  })],
   alias: {
     '@': './src',
   },
@@ -22,7 +30,7 @@ export default defineConfig({
         secure: false,
         changeOrigin: true,
         headers: {
-          Cookie: 'sess=sta918dc2a3a132784ac8712a5d9064666'
+          Cookie: 'sess=st368fbfff4d383f105a7e88d07898cc4e'
         }
         // pathRewrite: { '^/api': '' },
       },

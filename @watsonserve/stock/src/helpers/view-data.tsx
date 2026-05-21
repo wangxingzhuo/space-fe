@@ -31,6 +31,7 @@ export const dict: Record<string, { title: string; vType: string; impLine?: numb
   cost:               { title: 'cost',     vType: 'money' },
   dividendRate:       { title: 'dividend', vType: 'rate', impLine: 5 },
   ttime:              { title: 'date',     vType: 'date' },
+  realise:            { title: 'realise',  vType: 'money' },
 };
 
 const dataRender: Record<string, (n: number) => string> = {

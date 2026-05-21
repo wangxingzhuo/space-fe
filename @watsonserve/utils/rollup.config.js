@@ -4,30 +4,33 @@ import typescript from '@rollup/plugin-typescript'
 import * as path from 'path'
 import * as fsp from 'fs/promises'
 
-function asmResolve({ matcher }) {
+async function getEntry(pkgName) {
+  const pkgDir = path.join(import.meta.dirname, 'node_modules', pkgName);
+  const pkg = await fsp.readFile(path.join(pkgDir, 'package.json'));
+  const entry = JSON.parse(pkg).main;
+  return path.join(pkgDir, entry);
+}
+
+async function asmResolve({ matcher }) {
+  const wasmEntry = await getEntry(matcher);
+
   return {
     name: 'wasm_resolve',
     async resolveId(id) {
-      if (!id.match(matcher)) return null;
-
-      if (id.endsWith('.wasm')) return { id, external: false };
-
-      const pkgDir = path.join(import.meta.dirname, 'node_modules', id);
-      const pkg = await fsp.readFile(path.join(pkgDir, 'package.json'));
-      const entry = JSON.parse(pkg).main;
-      return { id: path.join(pkgDir, entry), external: false };
+      if (id === matcher) return { id: wasmEntry, external: false };
     },
     async load(id) {
-      if (!id.endsWith('.wasm')) return;
+      if (wasmEntry !== id) return;
 
-      const wasm = await fsp.readFile(id);
-      const dts = await fsp.readFile(path.join(path.dirname(id), 'index.d.ts'));
+      const dirPath = path.dirname(id);
+
+      const wasm = await fsp.readFile(path.join(dirPath, 'index.wasm'));
+      const dts = await fsp.readFile(path.join(dirPath, 'index.d.ts'));
       this.emitFile({ type: 'asset', fileName: 'index.wasm', source: wasm });
       this.emitFile({ type: 'asset', fileName: 'asm.d.ts', source: dts });
-      return fsp.readFile(path.join(path.dirname(id), 'index.js'), { encoding: 'utf-8' });
     },
     transform(code, id) {
-      if (!id.endsWith('.wasm')) return code;
+      if (wasmEntry !== id) return code;
 
       const { body } = this.parse(code);
       const _exports = body[1].declaration.declarations[0].id.properties.map(item => item.key.name);
@@ -49,7 +52,7 @@ export default [
          resolve(),
          commonjs(),
          typescript(),
-         asmResolve({ matcher: /@watsonserve\/asm/ })
+         asmResolve({ matcher: '@watsonserve/asm' })
       ]
    }
 ]

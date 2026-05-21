@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { ISumInfo } from '@/entities';
-import classes from './summary.module.styl';
 import Button from '@watsonserve/ui/button';
+import classes from './summary.module.styl';
 
 interface IProps {
   dateSeg: string;
@@ -10,11 +10,12 @@ interface IProps {
   changeGain: (tag: string, currency: string) => void;
 }
 
-export default function App(props: IProps) {
+export default function Summary(props: IProps) {
   const { dateSeg, currency, sumInfo, changeGain } = props;
   const {
     totalDivTTM = 0, totalCost = 0, totalAsset = 0,
-    twrr = 0, appreciation = 0, allDivid = 0, twrrForYear = 0, xirr = 0, srrForYear = 0
+    unrealised = 0, allDivid = 0, realised = 0,
+    twrr = 0, twrrForYear = 0, xirr = 0, srrForYear = 0
   } = sumInfo;
 
   const list = useMemo(() => {
@@ -26,14 +27,15 @@ export default function App(props: IProps) {
       ['Assets', `${curr} ${totalAsset.toLocaleString()}`],
 
       ['Dividend Yield', `${curr} ${allDivid.toLocaleString()}`],
-      ['Capital Appreciation', `${curr} ${appreciation.toLocaleString()}`],
-      ['TWRR', `${twrr.toFixed(2)}%`],
+      ['Unrealised', `${curr} ${unrealised.toLocaleString()}`],
+      ['Realised', `${curr} ${realised.toLocaleString()}`],
+      'TY' === dateSeg ? ['TWRR', `${twrr.toFixed(2)}%`] : undefined,
 
       ['SRR (FY)', `${srrForYear.toFixed(2)}%`],
-      ['XIRR (FY)', `${xirr.toFixed(2)}%`],
+      ['MWRR (FY)', `${xirr.toFixed(2)}%`],
       ['TWRR (FY)', `${twrrForYear.toFixed(2)}%`],
-    ]
-  }, [totalDivTTM, totalCost, totalAsset, twrr, appreciation, allDivid, twrrForYear, xirr, srrForYear]);
+    ].filter(Boolean) as [string, string][];
+  }, [totalDivTTM, totalCost, totalAsset, twrr, unrealised, allDivid, twrrForYear, xirr, srrForYear]);
 
   return (
     <>
