@@ -38,7 +38,7 @@ export class DAO extends InfluxDAO {
 
   async loadDividend(ncs: string[]) {
     const now = new Date();
-    const lastYear = Date.UTC(now.getUTCFullYear()-1, now.getUTCMonth(), now.getUTCDate()) / 1000;
+    const lastYear = Date.UTC(now.getUTCFullYear()-1, now.getUTCMonth()+1, 1) / 1000;
 
     const result = await Dividend.find({ nc: { $in: ncs }, ex: { $gt: ~~lastYear } }).exec();
 
@@ -63,7 +63,10 @@ export class DAO extends InfluxDAO {
   }
 
   async writeDividend(divPoints: IDiv[]) {
-    await Dividend.bulkWrite(divPoints.map(doc => ({ updateOne: { filter: doc, update: { $set: doc }, upsert: true } })));
+    await Dividend.bulkWrite(divPoints.map(doc => {
+      const { nc, ex, paid } = doc;
+      return { updateOne: { filter: { nc, ex, paid }, update: { $set: doc }, upsert: true } };
+    }));
   }
 
   async readHolidays(s: number, e: number) {

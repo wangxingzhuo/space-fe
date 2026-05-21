@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'fs/promises';
   delete pkg.devDependencies;
   const { setup } = pkg.scripts;
   pkg.scripts = { setup };
-  pkg.dependencies['@watsonserve/stock-base'] = '^0.1.0';
+  pkg.dependencies['@watsonserve/stock-base'] = '^0.1.1';
   await writeFile('dist/package.json', JSON.stringify(pkg, null, 2));
 })();
 

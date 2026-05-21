@@ -1,6 +1,7 @@
 import { A_DAY_S } from './close-time.js';
 import { DividendLoader } from './dividend-loader.js';
 import { IHoliday } from './stock.js';
+import { generateUSHolidays } from './us-holiday.js';
 
 export * from './close-time.js';
 export * from './stock.js';
@@ -74,10 +75,12 @@ export class StockLoader extends DividendLoader {
   }
 
   async loadHolidays() {
-    const [holidaysSG, holidaysHK] = await Promise.all([
-      this.loadHolidaysSG(new Date().getUTCFullYear()),
-      this.loadHolidaysHK()
+    const yyyy = new Date().getUTCFullYear();
+    const [holidaysSG, holidaysHK, holidaysUS] = await Promise.all([
+      this.loadHolidaysSG(yyyy),
+      this.loadHolidaysHK(),
+      generateUSHolidays(yyyy)
     ]);
-    return holidaysSG.concat(holidaysHK);
+    return holidaysSG.concat(holidaysHK).concat(holidaysUS);
   }
 }
