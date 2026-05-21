@@ -26,7 +26,7 @@ export default function Summary(props: IProps) {
       ['Dividend Yield (TTM)', `${(totalDivTTM / totalCost * 100).toFixed(2)}%`],
       ['Assets', `${curr} ${totalAsset.toLocaleString()}`],
 
-      ['Dividend Yield', `${curr} ${allDivid.toLocaleString()}`],
+      ['Dividend', `${curr} ${allDivid.toLocaleString()}`],
       ['Unrealised', `${curr} ${unrealised.toLocaleString()}`],
       ['Realised', `${curr} ${realised.toLocaleString()}`],
       'TY' === dateSeg ? ['TWRR', `${twrr.toFixed(2)}%`] : undefined,

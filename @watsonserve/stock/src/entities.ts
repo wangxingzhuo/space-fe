@@ -28,12 +28,13 @@ export interface IViewData {
   nc: string;
   percent: number;
   glStyl: string;
-  unrealizedGainRate: number;
+  gainRate: number;
   currency: string;
   count: number;
-  dividendRate: number;
+  dividendYield: number;
   price: number;
   cost: number;
+  date: number;
 }
 
 export interface ISumInfo {
@@ -151,7 +152,7 @@ export class HandleStock implements IHandleStock {
     return this.marketValue - this.cost;
   }
 
-  get unrealizedGainRate() {
+  get gainRate() {
     return this.unrealizedGain * 100 / this.cost;
   }
 
@@ -178,7 +179,7 @@ export class HandleStock implements IHandleStock {
     return divd * this.count;
   }
 
-  get dividendRate() {
+  get dividendYield() {
     return this.dividendTTM * 100 / this.cost;
   }
 }

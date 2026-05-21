@@ -1,19 +1,7 @@
 import { classify } from '@watsonserve/utils';
+import { IViewData } from '@/entities';
 
 const ginsColor = ['st-loss', 'st-gray', 'st-gins'];
-
-interface IViewData {
-  nc: string;
-  percent: number;
-  glStyl: string;
-  unrealizedGainRate: number;
-  currency: string;
-  count: number;
-  dividendRate: number;
-  price: number;
-  cost: number;
-  date: number;
-}
 
 export interface IDataFiled {
   filed: string;
@@ -23,15 +11,15 @@ export interface IDataFiled {
 }
 
 export const dict: Record<string, { title: string; vType: string; impLine?: number; }> = {
-  nc:                 { title: 'code',     vType: 'str' },
-  percent:            { title: 'percent',  vType: 'rate', impLine: 5 },
-  unrealizedGainRate: { title: 'gain',     vType: 'rate', impLine: 20 },
-  price:              { title: 'price',    vType: 'money' },
-  count:              { title: 'count',    vType: 'num' },
-  cost:               { title: 'cost',     vType: 'money' },
-  dividendRate:       { title: 'dividend', vType: 'rate', impLine: 5 },
-  ttime:              { title: 'date',     vType: 'date' },
-  realise:            { title: 'realise',  vType: 'money' },
+  nc:           { title: 'Code',      vType: 'str' },
+  percent:      { title: 'Portfolio', vType: 'rate', impLine: 5 },
+  gainRate:     { title: 'Chg',       vType: 'rate', impLine: 20 },
+  price:        { title: 'Price',     vType: 'money' },
+  count:        { title: 'Count',     vType: 'num' },
+  cost:         { title: 'Cost',      vType: 'money' },
+  dividendYield: { title: 'Div Yield', vType: 'rate', impLine: 5 },
+  ttime:        { title: 'Date',      vType: 'date' },
+  realise:      { title: 'Realised',  vType: 'money' },
 };
 
 const dataRender: Record<string, (n: number) => string> = {
@@ -41,9 +29,9 @@ const dataRender: Record<string, (n: number) => string> = {
 };
 
 export function viewRow(classes: Record<string, string>, headerOrder: string[], row: Partial<IViewData>): IDataFiled[] {
-  const { unrealizedGainRate = 0, currency } = row;
+  const { gainRate = 0, currency } = row;
   const curr = `${currency?.substring(0, 2)}$`;
-  const glStyl = ginsColor[Math.sign(unrealizedGainRate) + 1];
+  const glStyl = ginsColor[Math.sign(gainRate) + 1];
 
   const vRow = headerOrder.map(filed => {
     let { vType, impLine = 0 } = dict[filed];
@@ -51,7 +39,7 @@ export function viewRow(classes: Record<string, string>, headerOrder: string[], 
     const isImp = 'rate' === vType && impLine < val;
     const className = classify({
       [classes[`st-${vType}`]]: true,
-      [classes[glStyl]]: 'unrealizedGainRate' === filed,
+      [classes[glStyl]]: 'gainRate' === filed,
       [classes['st-imp']]: isImp
     });
     const viewVal = 'money' === vType ? `${curr} ${dataRender.num(val)}` : dataRender[vType]?.(val) || val;

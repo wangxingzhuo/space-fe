@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import Button from '@watsonserve/ui/button';
+import Avatar from '@watsonserve/ui/avatar';
 import { useStore } from '@/store';
 import { ITade } from '@/entities';
 import { recordAtrade } from '@/api';
-import Avatar from '@/components/avatar';
 import RecordTrade from '@/components/record-trade';
 import Tips from '@/components/tips';
 import classes from './index.module.styl';

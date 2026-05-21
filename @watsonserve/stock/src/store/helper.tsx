@@ -77,7 +77,7 @@ class RInfoMgr {
     const recentlyDividends: any[] = [];
 
     for (const st of _stocks) {
-      const { nc, usdMarketValue, unrealizedGainRate, currency, count, dividendRate, price, cost, usdDividendTTM, dividend } = st;
+      const { nc, usdMarketValue, gainRate, currency, count, dividendYield, price, cost, usdDividendTTM, dividend } = st;
       totalDivTTM += usdDividendTTM;
 
       dividend.forEach(item => {
@@ -87,7 +87,7 @@ class RInfoMgr {
       });
 
       const percent = usdMarketValue * 100 / totalUSDAsset;
-      stocks.push({ nc, percent, unrealizedGainRate, currency, count, dividendRate, price, cost } as IViewData);
+      stocks.push({ nc, percent, gainRate, currency, count, dividendYield, price, cost } as IViewData);
     }
 
     this.__totalDetails = { fxs, totalDivTTM, totalUSDCost, totalUSDAsset };
