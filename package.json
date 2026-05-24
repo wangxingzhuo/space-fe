@@ -19,7 +19,8 @@
     "webdev": "pnpm run --filter @watsonserve/web start",
     "dev": "pnpm run --filter @watsonserve/electron dev",
     "resource": "pnpm run --filter @watsonserve/resources build",
-    "stock": "pnpm run --filter @watsonserve/stock start"
+    "stock": "pnpm run --filter @watsonserve/stock start",
+    "build_stock": "pnpm run --filter @watsonserve/stock build"
   },
   "devDependencies": {
     "typescript": "^6.0.2",

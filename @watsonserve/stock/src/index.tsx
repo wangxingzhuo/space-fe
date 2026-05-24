@@ -13,8 +13,8 @@ function Root() {
   return (
     <StrictMode>
       <Store>
-        <Header />
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/records" element={<Records />} />
