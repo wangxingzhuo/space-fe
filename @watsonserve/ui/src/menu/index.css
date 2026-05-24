@@ -20,6 +20,19 @@ li.some-menu__item {
   cursor: pointer;
 }
 
+.some-menu__item__main {
+  display: flex;
+  align-items: center;
+  color: var(--btn-color);
+  fill: var(--btn-color);
+}
+
+.some-menu__item__main .some-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
 li.some-menu__item:hover {
   background-color: var(--form-hover-color);
 }

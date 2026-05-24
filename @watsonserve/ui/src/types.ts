@@ -30,7 +30,7 @@ export interface ITabBarProps {
 
 export interface IMenuTree<T> extends INameTitle<T> {
   className?: string;
-  Icon?: () => ReactElement;
+  Icon?: (props: { className?: string }) => ReactElement;
   tip?: string;
   checkbox?: boolean;
   active?: boolean;
@@ -43,6 +43,7 @@ export interface IMenuProps<T = string> {
   style?: any;
   tree: (IMenuTree<T> | null)[];
   onClick(dist: IMenuTree<T>): void;
+  onClose?(): void;
 }
 
 export interface ISelectorProps<T = string> {

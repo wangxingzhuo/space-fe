@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { IMenuTree, IMenuProps } from '../types';
 import { classify } from '@watsonserve/utils';
 import './index.css';
@@ -25,7 +25,7 @@ function MenuItem<T>(props: IMenuTree<T> & { onClick(): void }) {
     return (
       <li className={_className} onClick={handleClick}>
         <div className="some-menu__item__main">
-          {Icon && <Icon />}
+          {Icon && <Icon className="some-icon" />}
           {checkbox && <input type="checkbox" checked={active} /> }
           <span className="some-menu__item__title">{title}</span>
         </div>
@@ -36,7 +36,8 @@ function MenuItem<T>(props: IMenuTree<T> & { onClick(): void }) {
 }
 
 export default function Menu<T>(props: IMenuProps<T>) {
-  const { className, style, tree, onClick } = props;
+  const selfRef = useRef<HTMLUListElement>(null);
+  const { className, style, tree, onClick, onClose } = props;
 
   const handleClick = useCallback((dist: IMenuTree<T>) => {
     if (dist.children) {
@@ -55,8 +56,21 @@ export default function Menu<T>(props: IMenuProps<T>) {
     [...tree, handleClick]
   );
 
+  useEffect(() => {
+    const foo = (ev: any) => {
+      let el = ev.target;
+      while(el !== selfRef.current && el !== document.body) {
+        el = el.parentElement;
+      }
+      el === document.body && onClose?.();
+    };
+
+    window.addEventListener('click', foo, true);
+    return () => window.removeEventListener('click', foo, true);
+  }, [onClose]);
+
   return useMemo(() => (
-    <ul className={classify('some-menu', className)} style={style}>
+    <ul ref={selfRef} className={classify('some-menu', className)} style={style}>
       {list}
     </ul>
   ), [className, style, list]);
