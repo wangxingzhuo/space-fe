@@ -1,0 +1,46 @@
+{
+  "name": "i18n-console-fe",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "rsbuild dev --open",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview"
+  },
+  "dependencies": {
+    "@arco-design/web-react": "^2.66.14",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router": "^7.14.1",
+    "react-router-dom": "^7.14.1"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "^1.7.5",
+    "@rsbuild/plugin-node-polyfill": "^1.4.4",
+    "@rsbuild/plugin-react": "^1.4.6",
+    "@rsbuild/plugin-stylus": "^1.3.1",
+    "@rsbuild/plugin-svgr": "^1.3.1",
+    "typescript": "^6.0.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
