@@ -1,4 +1,4 @@
-import { IRedirect, IHandleStock, IUsr, ITade, type IDividend, HandleStock, IGap, INetCash, IROR } from '@/entities';
+import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar } from '@/entities';
 import { Method, request } from '@watsonserve/connector';
 
 export async function loadUsr() {
@@ -60,31 +60,12 @@ export async function recordAtrade(payload: ITade): Promise<void> {
   return 200 === status ? undefined : Promise.reject(new Error(msg));
 }
 
-interface IRR {
-  twr: IGap[];
-  xir: INetCash[];
-}
-
-async function loadRR(start: number, end: number) {
+export async function loadRR(start: number, end: number) {
   const { data: body } = await request({
-    api: `${globalThis.location?.origin || ''}/api/gain?start=${start}&end=${end}`
+    api: `${globalThis.location?.origin || ''}/api/capital?start=${start}&end=${end}`
   });
 
-  return (body as any).data as IRR;
-}
-
-async function loadDividends(start: number, end: number) {
-  const { data: body } = await request({
-    api: `${globalThis.location?.origin || ''}/api/dividends?start=${start}&end=${end}`
-  });
-
-  return (body as Record<string, IDividend[]>).data;
-}
-
-export async function loadGain(sTime: number, eTime: number) {
-  const [rr, divs] = await Promise.all([loadRR(sTime, eTime), loadDividends(sTime, eTime)]);
-  const { twr, xir } = rr;
-  return { twr, xir, divs } as IROR;
+  return (body as any).data as IROR;
 }
 
 export async function loadRecords(start: number, end: number): Promise<any[]> {
@@ -96,4 +77,31 @@ export async function loadRecords(start: number, end: number): Promise<any[]> {
 
   const { status, msg, data } = body as Record<string, any>;
   return 200 === status ? data : Promise.reject(new Error(msg));
+}
+
+export async function loadCalendar() {
+  const { data: body } = await request({ api: `${globalThis.location?.origin || ''}/api/calendar` });
+
+  const { status, msg, data: list } = body as Record<string, any>;
+  if (200 !== status) return Promise.reject(new Error(msg));
+
+  const markets: Record<string, ICalendar[]> = {};
+
+  for (const item of list as ICalendar[]) {
+    const { market, title, start, end } = item;
+
+    const subList = markets[market] || [];
+    markets[market] = subList;
+    const afterOne = subList[0];
+
+    // concat two holidays by weekend
+    if (6 === new Date(end * 1000).getUTCDay() && afterOne && end + (86400000 << 1) === afterOne.start) {
+      afterOne.start = start;
+      afterOne.title = `${title} & ${afterOne.title}`;
+      continue;
+    }
+    subList.unshift({ market, title, start, end });
+  }
+
+  return Object.values(markets).flat().sort((a, b) => b.start - a.start);
 }

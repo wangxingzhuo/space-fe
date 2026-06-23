@@ -13,8 +13,8 @@ function Root() {
   return (
     <StrictMode>
       <Store>
-        <Header />
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/records" element={<Records />} />
@@ -25,4 +25,4 @@ function Root() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(<Root />);
+createRoot(document.querySelector('.app')!).render(<Root />);

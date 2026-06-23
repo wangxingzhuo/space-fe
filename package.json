@@ -6,22 +6,21 @@
     "@watsonserve/*"
   ],
   "scripts": {
-    "utils": "pnpm --filter @watsonserve/asm build && pnpm --filter @watsonserve/utils build",
+    "utils": "pnpm --filter @watsonserve/asm run build && pnpm --filter @watsonserve/utils build",
     "audio": "pnpm --filter @watsonserve/audioplayer build",
     "ui": "pnpm --filter @watsonserve/ui build",
     "connector": "pnpm --filter @watsonserve/connector build",
-    "web": "pnpm workspace @watsonserve/web build",
-    "resources": "pnpm workspace @watsonserve/resources build",
-    "elec": "pnpm workspace @watsonserve/electron build",
+    "web": "pnpm run --filter @watsonserve/web build",
+    "resources": "pnpm run --filter @watsonserve/resources build",
+    "elec": "pnpm run --filter @watsonserve/electron build",
     "build": "pnpm utils && pnpm audio && pnpm web && pnpm elec",
     "package": "pnpm build && ./pack.sh",
     "buildweb": "pnpm web && rm -rf ./dist/views && mv ./@watsonserve/web/build ./dist/views",
     "webdev": "pnpm run --filter @watsonserve/web start",
-    "dev": "pnpm workspace @watsonserve/electron dev",
-    "resource": "pnpm workspace @watsonserve/resources build",
-    "stock-loader": "pnpm run --filter @watsonserve/stock-base build",
-    "stock-build": "pnpm run --filter @watsonserve/stock-node build",
-    "stock-dev": "pnpm run --filter @watsonserve/stock-node srv"
+    "dev": "pnpm run --filter @watsonserve/electron dev",
+    "resource": "pnpm run --filter @watsonserve/resources build",
+    "stock": "pnpm run --filter @watsonserve/stock start",
+    "build_stock": "pnpm run --filter @watsonserve/stock build"
   },
   "devDependencies": {
     "typescript": "^6.0.2",

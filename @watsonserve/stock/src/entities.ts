@@ -28,12 +28,13 @@ export interface IViewData {
   nc: string;
   percent: number;
   glStyl: string;
-  unrealizedGainRate: number;
+  gainRate: number;
   currency: string;
   count: number;
-  dividendRate: number;
+  dividendYield: number;
   price: number;
   cost: number;
+  date: number;
 }
 
 export interface ISumInfo {
@@ -41,11 +42,17 @@ export interface ISumInfo {
   totalCost: number;
   totalAsset: number;
   twrr: number;
-  appreciation: number;
+  unrealised: number;
   allDivid: number;
   twrrForYear: number;
   xirr: number;
   srrForYear: number;
+  realised: number;
+}
+
+export interface IHoliday {
+  title: string;
+  desc: string;
 }
 
 export interface IState {
@@ -53,18 +60,19 @@ export interface IState {
   currency: string;
   dateSeg: string;
   handles: IViewData[];
-  comingDivs: never[];
+  comingDivs: string[];
   sumInfo: Partial<ISumInfo>;
+  holidays: IHoliday[];
 }
 
-export interface IDiv {
+interface IDiv {
   ex: number;
   paid: number;
   currency: string;
   amount: number;
 }
 
-export interface IDividend {
+interface IDividend {
   date: number;
   fxs: Record<string, number>;
   amount: number;
@@ -81,7 +89,7 @@ export interface IHandleStock {
   dividend: IDiv[];
 }
 
-export interface IGap {
+interface IGap {
   date: number;
   fxs: Record<string, number>;
   gap: {
@@ -90,17 +98,24 @@ export interface IGap {
   }
 }
 
-export interface INetCash {
+interface INetCash {
   t: number;
   fxs: Record<string, number>;
   net_cash: number;
 }
 
-
 export interface IROR {
   twr: IGap[];
-  xir: INetCash[];
-  divs: IDividend[];
+  mwr: INetCash[];
+  dividend: IDividend[];
+  realised: IDividend[];
+}
+
+export interface ICalendar {
+  market: string;
+  title: string;
+  start: number;
+  end: number;
 }
 
 export class HandleStock implements IHandleStock {
@@ -137,7 +152,7 @@ export class HandleStock implements IHandleStock {
     return this.marketValue - this.cost;
   }
 
-  get unrealizedGainRate() {
+  get gainRate() {
     return this.unrealizedGain * 100 / this.cost;
   }
 
@@ -164,7 +179,7 @@ export class HandleStock implements IHandleStock {
     return divd * this.count;
   }
 
-  get dividendRate() {
+  get dividendYield() {
     return this.dividendTTM * 100 / this.cost;
   }
 }

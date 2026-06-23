@@ -13,14 +13,16 @@
     "@types/lodash": "^4.17.20",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "@types/react-router": "^5.1.20",
     "@watsonserve/connector": "^0.0.5",
-    "@watsonserve/ui": "^0.0.6",
+    "@watsonserve/ui": "^0.0.7",
     "@watsonserve/utils": "workspace:../utils/dist",
     "decimal.js": "^10.6.0",
     "events": "^3.3.0",
     "lodash": "^4.17.21",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-router": "^7.15.1",
     "react-router-dom": "^7.9.5"
   },
   "devDependencies": {
