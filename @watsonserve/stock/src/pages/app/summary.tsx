@@ -29,7 +29,7 @@ export default function Summary(props: IProps) {
       ['Dividend', `${curr} ${allDivid.toLocaleString()}`],
       ['Unrealised', `${curr} ${unrealised.toLocaleString()}`],
       ['Realised', `${curr} ${realised.toLocaleString()}`],
-      'TY' === dateSeg ? ['TWRR', `${twrr.toFixed(2)}%`] : undefined,
+      'YTD' === dateSeg ? ['TWRR', `${twrr.toFixed(2)}%`] : undefined,
 
       ['SRR (FY)', `${srrForYear.toFixed(2)}%`],
       ['MWRR (FY)', `${xirr.toFixed(2)}%`],
@@ -42,7 +42,7 @@ export default function Summary(props: IProps) {
       <div className={classes['data-row']}>
         <div>
           <Button type="round" active={'LFY' === dateSeg} disabled={'LFY' === dateSeg} onClick={() => changeGain('LFY', currency)}>LFY</Button>
-          <Button type="round" active={'TY' === dateSeg} disabled={'TY' === dateSeg} onClick={() => changeGain('TY', currency)}>This Year</Button>
+          <Button type="round" active={'YTD' === dateSeg} disabled={'YTD' === dateSeg} onClick={() => changeGain('YTD', currency)}>YTD</Button>
         </div>
         <div>
           <Button type="round" active={'USD' === currency} disabled={'USD' === currency} onClick={() => changeGain(dateSeg, 'USD')}>USD</Button>

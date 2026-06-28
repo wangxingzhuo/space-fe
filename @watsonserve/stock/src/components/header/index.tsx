@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import Button from '@watsonserve/ui/button';
 import Avatar from '@watsonserve/ui/avatar';
 import { useStore } from '@/store';

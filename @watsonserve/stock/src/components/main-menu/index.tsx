@@ -3,7 +3,7 @@ import { type IMenuTree } from '@watsonserve/ui/types';
 import classes from './index.module.styl';
 import IconPlus from '@/assets/icons/plus.svg';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 interface IContextMenuProps {
   onClick: (name: string) => void;

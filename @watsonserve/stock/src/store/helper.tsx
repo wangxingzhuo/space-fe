@@ -32,7 +32,7 @@ class RInfoMgr {
 
   protected getTimeSegment(tSeg: string): [number, number] {
     const { thisYear, tomorrow, lastYear } = this;
-    return 'TY' === tSeg ? [thisYear, tomorrow] : [lastYear, thisYear];
+    return 'YTD' === tSeg ? [thisYear, tomorrow] : [lastYear, thisYear];
   }
 
   async getRInfo(tag: string, currency: string) {
@@ -69,7 +69,7 @@ class RInfoMgr {
   async loadHandles() {
     const today = this.today;
     const recently = today + 60 * 86400;
-    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('TY', 'USD')]);
+    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('YTD', 'USD')]);
     const { fxs, stocks: _stocks, totalUSDAsset, totalUSDCost } = result;
 
     const stocks: IViewData[] = [];
@@ -134,7 +134,7 @@ export function useData() {
       handles: [] as IViewData[],
       comingDivs: [],
       currency: 'USD',
-      dateSeg: 'TY',
+      dateSeg: 'YTD',
       sumInfo: {} as ISumInfo,
       holidays: []
     } as IState
@@ -150,7 +150,7 @@ export function useData() {
     const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHandles();
     const comingDivs = comingDividends(stocks, recentlyDividends, lastDivDate);
 
-    dispatch({ handles: stocks, comingDivs, currency: 'USD', dateSeg: 'TY', sumInfo });
+    dispatch({ handles: stocks, comingDivs, currency: 'USD', dateSeg: 'YTD', sumInfo });
   }, []);
 
   const loadUser = useCallback(() => {
