@@ -19,6 +19,11 @@ export default function (props: IProps) {
   const [date, setDate] = useState(new Date().toJSON().substring(0, 10));
   const formRef = useRef<HTMLFormElement|null>(null);
 
+  const handleTTypeChange = (t: number) => {
+    EnTType.XD === t && setCount(0);
+    setTType(t);
+  };
+
   const handleSubmit = useCallback((ev: any) => {
     ev.stopPropagation();
     ev.preventDefault();
@@ -35,13 +40,21 @@ export default function (props: IProps) {
         <h5 className={classes['record-trade__title']}>Record a trade</h5>
         <form className={classes['record-form']} ref={formRef} onSubmit={handleSubmit}>
           <input
+            className="some-input" type="date" placeholder="date" name="date" autoComplete="off"
+            value={date} onInput={(ev: any) => setDate(ev.target.value)}
+          />
+          <Selector
+            options={[{name: EnTType.BUY, title: 'buy'}, {name: EnTType.SELL, title: 'sell'}, {name: EnTType.XD, title: 'XD'}]}
+            value={tType}
+            onInput={handleTTypeChange}
+          />
+          <input
             className="some-input" placeholder="stock node" name="nc" autoComplete="off"
             value={nc} onInput={(ev: any) => setNc(ev.target.value)}
           />
-          <Selector
-            options={[{name: EnTType.BUY, title: 'buy'}, {name: EnTType.SELL, title: 'sell'}]}
-            value={tType}
-            onInput={setTType}
+          <input
+            className="some-input" type="number" placeholder="count" name="count" autoComplete="off"
+            disabled={EnTType.XD === tType} value={count} onInput={(ev: any) => setCount(ev.target.value)}
           />
           <Selector
             options={[{name: 'USD', title: 'USD'}, {name: 'SGD', title: 'SGD'}, {name: 'HKD', title: 'HKD'}] as any[]}
@@ -49,16 +62,8 @@ export default function (props: IProps) {
             onInput={setCurrency}
           />
           <input
-            className="some-input" type="number" placeholder="count" name="count" autoComplete="off"
-            value={count} onInput={(ev: any) => setCount(ev.target.value)}
-          />
-          <input
             className="some-input" type="number" placeholder="cost" name="cost" autoComplete="off"
             value={cost} onInput={(ev: any) => setCost(ev.target.value)}
-          />
-          <input
-            className="some-input" type="date" placeholder="date" name="date" autoComplete="off"
-            value={date} onInput={(ev: any) => setDate(ev.target.value)}
           />
           <Button type="submit" title="submit" onClick={handleSubmit} />
         </form>

@@ -36,6 +36,7 @@ export async function loadHandles() {
   let totalUSDAsset = 0;
   let totalUSDCost = 0;
   const stocks: HandleStock[] = [];
+
   for (const _st of _stocks) {
     const st = new HandleStock(_st, fxs[_st.currency]);
     stocks.push(st);

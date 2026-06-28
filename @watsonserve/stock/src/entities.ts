@@ -1,8 +1,8 @@
 export enum EnTType {
   BUY=1,
   SELL=2,
-  XR=4,
-  XD=3,
+  XD=4,
+  XR=8,
   BALANCE=-1
 }
 
