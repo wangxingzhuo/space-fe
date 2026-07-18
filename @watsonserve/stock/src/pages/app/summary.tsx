@@ -26,14 +26,14 @@ export default function Summary(props: IProps) {
       ['Dividend Yield (TTM)', `${(totalDivTTM / totalCost * 100).toFixed(2)}%`],
       ['Assets', `${curr} ${totalAsset.toLocaleString()}`],
 
-      ['Dividend', `${curr} ${allDivid.toLocaleString()}`],
-      ['Unrealised', `${curr} ${unrealised.toLocaleString()}`],
-      ['Realised', `${curr} ${realised.toLocaleString()}`],
-      'YTD' === dateSeg ? ['TWRR', `${twrr.toFixed(2)}%`] : undefined,
+      ['Dividend (YTD)', `${curr} ${allDivid.toLocaleString()}`],
+      ['Unrealised (YTD)', `${curr} ${unrealised.toLocaleString()}`],
+      ['Realised (YTD)', `${curr} ${realised.toLocaleString()}`],
 
       ['SRR (FY)', `${srrForYear.toFixed(2)}%`],
       ['MWRR (FY)', `${xirr.toFixed(2)}%`],
       ['TWRR (FY)', `${twrrForYear.toFixed(2)}%`],
+      'YTD' === dateSeg ? ['TWRR (YTD)', `${twrr.toFixed(2)}%`] : undefined,
     ].filter(Boolean) as [string, string][];
   }, [totalDivTTM, totalCost, totalAsset, twrr, unrealised, allDivid, twrrForYear, xirr, srrForYear]);
 

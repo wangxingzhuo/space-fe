@@ -87,7 +87,7 @@ class RInfoMgr {
       });
 
       const percent = usdMarketValue * 100 / totalUSDAsset;
-      stocks.push({ nc, percent, gainRate, currency, count, dividendYield, price, cost } as IViewData);
+      stocks.push({ nc, percent, gainRate, currency, count, dividendYield, price, book: +(cost / count).toFixed(3), cost } as IViewData);
     }
 
     this.__totalDetails = { fxs, totalDivTTM, totalUSDCost, totalUSDAsset };

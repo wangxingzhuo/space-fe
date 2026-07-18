@@ -33,6 +33,7 @@ export interface IViewData {
   count: number;
   dividendYield: number;
   price: number;
+  book: number;
   cost: number;
   date: number;
 }

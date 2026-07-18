@@ -28,7 +28,7 @@ export default function (props: IProps) {
     ev.stopPropagation();
     ev.preventDefault();
 
-    const { nc, count, cost, date } = Object.fromEntries([...new FormData(formRef.current!).entries()]) as Record<string, string>;
+    const { nc, count = 0, cost, date } = Object.fromEntries([...new FormData(formRef.current!).entries()]) as Record<string, string>;
     const arrDate = (date as string).split('-').map(Number) as [number, number, number];
     arrDate[1] -= 1;
     props.onSubmit?.({ nc, count: +count, cost: +cost, ttime: ~~(Date.UTC(...arrDate) / 1000), currency, ttype: tType });
