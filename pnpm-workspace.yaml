@@ -9,3 +9,8 @@ packages:
 
 allowBuilds:
   core-js: false
+  electron: false
+  esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@watsonserve/ui@0.0.8'

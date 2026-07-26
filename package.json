@@ -23,10 +23,10 @@
     "build_stock": "pnpm run --filter @watsonserve/stock build"
   },
   "devDependencies": {
-    "typescript": "^6.0.2",
     "@rsbuild/plugin-svgr": "^1.2.2",
     "@types/node": "^25.8.0",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@11.17.0"
 }

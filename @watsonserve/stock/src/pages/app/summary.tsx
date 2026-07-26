@@ -15,7 +15,7 @@ export default function Summary(props: IProps) {
   const {
     totalDivTTM = 0, totalCost = 0, totalAsset = 0,
     unrealised = 0, allDivid = 0, realised = 0,
-    twrr = 0, twrrForYear = 0, xirr = 0, srrForYear = 0
+    twrr = 0, twrrForYear = 0, xirr = 0, srr = 0, srrForYear = 0
   } = sumInfo;
 
   const list = useMemo(() => {
@@ -30,10 +30,9 @@ export default function Summary(props: IProps) {
       ['Unrealised (YTD)', `${curr} ${unrealised.toLocaleString()}`],
       ['Realised (YTD)', `${curr} ${realised.toLocaleString()}`],
 
-      ['SRR (FY)', `${srrForYear.toFixed(2)}%`],
+      ['SRR (YTD / FY)', `${srr.toFixed(2)}% / ${srrForYear.toFixed(2)}%`],
       ['MWRR (FY)', `${xirr.toFixed(2)}%`],
-      ['TWRR (FY)', `${twrrForYear.toFixed(2)}%`],
-      'YTD' === dateSeg ? ['TWRR (YTD)', `${twrr.toFixed(2)}%`] : undefined,
+      ['TWRR (YTD / FY)', `${twrr.toFixed(2)}% / ${twrrForYear.toFixed(2)}%`],
     ].filter(Boolean) as [string, string][];
   }, [totalDivTTM, totalCost, totalAsset, twrr, unrealised, allDivid, twrrForYear, xirr, srrForYear]);
 

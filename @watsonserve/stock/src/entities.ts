@@ -47,6 +47,7 @@ export interface ISumInfo {
   allDivid: number;
   twrrForYear: number;
   xirr: number;
+  srr: number;
   srrForYear: number;
   realised: number;
 }

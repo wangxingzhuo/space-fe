@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Store } from '@/store';
 import '@watsonserve/ui';
-import '@/assets/style/index.styl';
 import Header from './components/header';
 
+import('@/assets/style/index.styl');
 const App = lazy(() => import('@/pages/app'));
 const Records = lazy(() => import('@/pages/records'));
 

@@ -128,7 +128,9 @@ export function comput(sTime: number, eTime: number, curr = 'USD', ror: IROR) {
   const xirr = +compXIRR(xir, new Decimal(1 + twrrForYear / 100)).sub(1).mul(100).toFixed(2);
 
   return {
-    xirr, srrForYear, twrr, twrrForYear,
+    xirr,
+    srr, srrForYear,
+    twrr, twrrForYear,
     allDivid, realised,
     unrealised: appreciation - realised,
     lastDivDate: dividend[dividend.length-1]?.date || 0
