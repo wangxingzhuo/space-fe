@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '@/store';
 import { viewRow } from '@/helpers/view-data';
+import Stat from '@/components/stat';
 import DataTable from '@/components/data-table';
 import Summary from './summary';
-import Stat from './stat';
 import viewTableClasses from '@/components/data-table/index.module.styl';
 
 export default function App() {
