@@ -5,6 +5,7 @@ import Stat from '@/components/stat';
 import DataTable from '@/components/data-table';
 import Summary from './summary';
 import viewTableClasses from '@/components/data-table/index.module.styl';
+import Category from '@/components/category';
 
 export default function App() {
   const [statMsg, setStatMsg] = useState(' ');
@@ -42,6 +43,7 @@ export default function App() {
     <>
       <Summary dateSeg={dateSeg} currency={currency} sumInfo={sumInfo} changeGain={changeGain} />
       <DataTable headerFileds={headerOrder} viewData={viewData} sortBy={sortBy} setSortBy={setSortBy} onClick={handleDataClick} />
+      <Category holdings={handles} />
     </>
   )
 }
