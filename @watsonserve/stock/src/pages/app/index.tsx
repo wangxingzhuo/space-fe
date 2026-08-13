@@ -12,7 +12,7 @@ export default function App() {
   const [headerOrder, setHeaderOrder] = useState<string[]>(['nc', 'percent', 'gainRate', 'dividendYield', 'price', 'book', 'count', 'cost']);
   const [sortBy, setSortBy] = useState('percent');
   const { state, initial, changeGain } = useStore();
-  const { currency = '', handles = [], dateSeg = '', sumInfo = {} } = state;
+  const { currency = '', handles = [], dateSeg = '', sumInfo = {}, categoryDict = {} } = state;
 
   const viewData = useMemo(
     () => (handles as any[])
@@ -43,7 +43,7 @@ export default function App() {
     <>
       <Summary dateSeg={dateSeg} currency={currency} sumInfo={sumInfo} changeGain={changeGain} />
       <DataTable headerFileds={headerOrder} viewData={viewData} sortBy={sortBy} setSortBy={setSortBy} onClick={handleDataClick} />
-      <Category holdings={handles} />
+      <Category holdings={handles} categoryDict={categoryDict} />
     </>
   )
 }

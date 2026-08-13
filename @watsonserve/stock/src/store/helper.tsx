@@ -136,7 +136,8 @@ export function useData() {
       currency: 'USD',
       dateSeg: 'YTD',
       sumInfo: {} as ISumInfo,
-      holidays: []
+      holidays: [],
+      categoryDict: {} as Record<string, string>
     } as IState
   );
 
@@ -150,7 +151,10 @@ export function useData() {
     const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHandles();
     const comingDivs = comingDividends(stocks, recentlyDividends, lastDivDate);
 
-    dispatch({ handles: stocks, comingDivs, currency: 'USD', dateSeg: 'YTD', sumInfo });
+    const resp = await fetch(`/category.json?ncs=${stocks.map(({ nc }) => nc).join(',')}`);
+    const categoryDict = await resp.json();
+
+    dispatch({ handles: stocks, comingDivs, currency: 'USD', dateSeg: 'YTD', sumInfo, categoryDict });
   }, []);
 
   const loadUser = useCallback(() => {

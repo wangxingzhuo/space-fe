@@ -65,6 +65,7 @@ export interface IState {
   comingDivs: string[];
   sumInfo: Partial<ISumInfo>;
   holidays: IHoliday[];
+  categoryDict: Record<string, string>;
 }
 
 interface IDiv {
