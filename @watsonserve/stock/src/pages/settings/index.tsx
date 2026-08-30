@@ -3,29 +3,31 @@ import Button from '@watsonserve/ui/button';
 import { useStore } from '@/store';
 import classes from './index.module.styl';
 
-const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
 const currencies = ['USD', 'HKD', 'SGD', 'CNY'];
+const fiscalYearOptions = [
+  { value: '01-01', label: '1月1日' },
+  { value: '04-01', label: '4月1日' },
+  { value: '04-05', label: '4月5日' },
+  { value: '07-01', label: '7月1日' }
+];
 
 export default function Settings() {
   const { state, updateSettings } = useStore();
   const [currency, setCurrency] = useState('USD');
-  const [month, setMonth] = useState(1);
+  const [fiscalYearStartDate, setFiscalYearStartDate] = useState('01-01');
   const [msg, setMsg] = useState('');
 
   useEffect(() => {
     const { settings } = state;
     if (!settings) return;
     setCurrency(settings.defaultCurrency);
-    setMonth(settings.fiscalYearStartMonth);
+    setFiscalYearStartDate(settings.fiscalYearStartDate);
   }, [state.settings]);
 
   const handleSave = async () => {
     await updateSettings({
       defaultCurrency: currency,
-      fiscalYearStartMonth: month
+      fiscalYearStartDate
     });
     setMsg('Saved');
   };
@@ -42,8 +44,8 @@ export default function Settings() {
         </div>
         <div className={classes.line}>
           <label className={classes.label}>Fiscal year starts in</label>
-          <select className={classes.select} value={month} onChange={ev => setMonth(+ev.target.value)}>
-            {months.map((item, idx) => <option value={idx + 1} key={item}>{item}</option>)}
+          <select className={classes.select} value={fiscalYearStartDate} onChange={ev => setFiscalYearStartDate(ev.target.value)}>
+            {fiscalYearOptions.map(item => <option value={item.value} key={item.value}>{item.label}</option>)}
           </select>
         </div>
         <Button type="submit" title="Save" onClick={handleSave} />

@@ -58,7 +58,7 @@ export interface IHoliday {
 }
 
 export interface ISettings {
-  fiscalYearStartMonth: number;
+  fiscalYearStartDate: string;
   defaultCurrency: string;
 }
 

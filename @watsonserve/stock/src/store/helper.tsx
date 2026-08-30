@@ -16,29 +16,32 @@ class RInfoMgr {
   private __infoCache: Record<string, string> = {};
   private __totalDetails: Partial<IDetail> = {};
   private __lastDivDate = 0;
-  private __fiscalYearStartMonth = 1;
+  private __fiscalYearStartDate = '01-01';
   readonly tomorrow: number;
   readonly today: number;
   private thisYear = 0;
   private lastYear = 0;
 
-  constructor(fiscalYearStartMonth = 1) {
+  constructor(fiscalYearStartDate = '01-01') {
     const now = new Date();
     const dayStamp = ~~(now.getTime() / 86400000);
     this.today = dayStamp * 86400;
     this.tomorrow = this.today + 86400;
-    this.setFiscalYearStartMonth(fiscalYearStartMonth);
+    this.setFiscalYearStartDate(fiscalYearStartDate);
   }
 
-  setFiscalYearStartMonth(fiscalYearStartMonth: number) {
-    const month = Number(fiscalYearStartMonth);
-    this.__fiscalYearStartMonth = Number.isInteger(month) && month > 0 && month <= 12 ? month : 1;
+  setFiscalYearStartDate(fiscalYearStartDate: string) {
+    const [month = '1', day = '1'] = String(fiscalYearStartDate).split('-');
+    const startMonth = Math.max(1, Math.min(12, Number(month) || 1));
+    const startDay = Math.max(1, Math.min(31, Number(day) || 1));
+    this.__fiscalYearStartDate = `${String(startMonth).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
     const now = new Date();
     const curYear = now.getUTCFullYear();
     const curMonth = now.getUTCMonth() + 1;
-    const fiscalYear = curMonth >= this.__fiscalYearStartMonth ? curYear : curYear - 1;
-    this.thisYear = ~~(new Date(Date.UTC(fiscalYear, this.__fiscalYearStartMonth - 1)).getTime() / 1000);
-    this.lastYear = ~~(new Date(Date.UTC(fiscalYear - 1, this.__fiscalYearStartMonth - 1)).getTime() / 1000);
+    const curDay = now.getUTCDate();
+    const fiscalYear = curMonth > startMonth || (curMonth === startMonth && curDay >= startDay) ? curYear : curYear - 1;
+    this.thisYear = ~~(new Date(Date.UTC(fiscalYear, startMonth - 1, startDay)).getTime() / 1000);
+    this.lastYear = ~~(new Date(Date.UTC(fiscalYear - 1, startMonth - 1, startDay)).getTime() / 1000);
     this.__rorCache = {};
     this.__infoCache = {};
   }
@@ -141,7 +144,7 @@ function comingDividends(stocks: IViewData[], recentlyDividends: any[], lastDivD
 
 export function useData() {
   const settingsRef = useRef(loadSettings());
-  const rInfoMgr = useRef(new RInfoMgr(settingsRef.current.fiscalYearStartMonth));
+  const rInfoMgr = useRef(new RInfoMgr(settingsRef.current.fiscalYearStartDate));
   const [state, dispatch] = useReducer(
     (prevState, payload) => ({ ...prevState, ...payload }),
     {
@@ -177,7 +180,7 @@ export function useData() {
   const updateSettings = useCallback(async (settings: ISettings) => {
     settingsRef.current = settings;
     saveSettings(settings);
-    rInfoMgr.current.setFiscalYearStartMonth(settings.fiscalYearStartMonth);
+    rInfoMgr.current.setFiscalYearStartDate(settings.fiscalYearStartDate);
     dispatch({ settings });
     await initial();
   }, [initial]);

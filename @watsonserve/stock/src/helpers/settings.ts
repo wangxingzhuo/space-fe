@@ -1,16 +1,20 @@
 import { ISettings } from '@/entities';
 
 const KEY = 'stock-settings';
+const supportedFiscalYearDates = ['01-01', '04-01', '04-05', '07-01'];
 const defaultSettings: ISettings = {
-  fiscalYearStartMonth: 1,
+  fiscalYearStartDate: '01-01',
   defaultCurrency: 'USD'
 };
 const supportedCurrencies = ['USD', 'HKD', 'SGD', 'CNY'];
 
-function normalizeMonth(month: unknown) {
-  const value = Number(month);
-  if (!Number.isInteger(value) || value < 1 || value > 12) return defaultSettings.fiscalYearStartMonth;
-  return value;
+function normalizeFiscalYearStartDate(value: unknown) {
+  const date = String(value);
+  if (supportedFiscalYearDates.includes(date)) return date;
+  if (value === 1) return '01-01';
+  if (value === 4) return '04-01';
+  if (value === 7) return '07-01';
+  return defaultSettings.fiscalYearStartDate;
 }
 
 function normalizeCurrency(currency: unknown) {
@@ -25,7 +29,7 @@ export function loadSettings(): ISettings {
   try {
     const parsed = JSON.parse(raw);
     return {
-      fiscalYearStartMonth: normalizeMonth(parsed?.fiscalYearStartMonth),
+      fiscalYearStartDate: normalizeFiscalYearStartDate(parsed?.fiscalYearStartDate ?? parsed?.fiscalYearStartMonth),
       defaultCurrency: normalizeCurrency(parsed?.defaultCurrency)
     };
   } catch (err) {
@@ -36,7 +40,7 @@ export function loadSettings(): ISettings {
 export function saveSettings(settings: ISettings) {
   if (typeof window === 'undefined') return;
   localStorage.setItem(KEY, JSON.stringify({
-    fiscalYearStartMonth: normalizeMonth(settings.fiscalYearStartMonth),
+    fiscalYearStartDate: normalizeFiscalYearStartDate(settings.fiscalYearStartDate),
     defaultCurrency: normalizeCurrency(settings.defaultCurrency)
   }));
 }
