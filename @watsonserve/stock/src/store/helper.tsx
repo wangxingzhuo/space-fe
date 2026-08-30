@@ -82,10 +82,10 @@ class RInfoMgr {
     } as ISumInfo;
   }
 
-  async loadHandles(currency = 'USD') {
+  async loadHandles() {
     const today = this.today;
     const recently = today + 60 * 86400;
-    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('YTD', currency)]);
+    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('YTD', 'USD')]);
     const { fxs, stocks: _stocks, totalUSDAsset, totalUSDCost } = result;
 
     const stocks: IViewData[] = [];
@@ -107,7 +107,6 @@ class RInfoMgr {
     }
 
     this.__totalDetails = { fxs, totalDivTTM, totalUSDCost, totalUSDAsset };
-    const fx = fxs?.[currency] || 1;
 
     return {
       stocks,
@@ -115,9 +114,9 @@ class RInfoMgr {
       lastDivDate: this.__lastDivDate,
       sumInfo: {
         ...rInfo,
-        totalDivTTM: totalDivTTM * fx,
-        totalCost: totalUSDCost * fx,
-        totalAsset: totalUSDAsset * fx,
+        totalDivTTM,
+        totalCost: totalUSDCost,
+        totalAsset: totalUSDAsset,
       } as ISumInfo
     };
   }
@@ -168,7 +167,7 @@ export function useData() {
 
   const initial = useCallback(async () => {
     const { defaultCurrency } = settingsRef.current;
-    const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHandles(defaultCurrency);
+    const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHandles();
     const comingDivs = comingDividends(stocks, recentlyDividends, lastDivDate);
 
     const resp = await fetch(`/category.json?ncs=${stocks.map(({ nc }) => nc).join(',')}`);
@@ -178,11 +177,20 @@ export function useData() {
   }, []);
 
   const updateSettings = useCallback(async (settings: ISettings) => {
+    const prevSettings = settingsRef.current;
     settingsRef.current = settings;
     saveSettings(settings);
-    rInfoMgr.current.setFiscalYearStartDate(settings.fiscalYearStartDate);
-    dispatch({ settings });
-    await initial();
+    const payload: Partial<IState> = { settings };
+
+    if (prevSettings.defaultCurrency !== settings.defaultCurrency) {
+      payload.currency = settings.defaultCurrency;
+    }
+    dispatch(payload);
+
+    if (prevSettings.fiscalYearStartDate !== settings.fiscalYearStartDate) {
+      rInfoMgr.current.setFiscalYearStartDate(settings.fiscalYearStartDate);
+      await initial();
+    }
   }, [initial]);
 
   const loadUser = useCallback(() => {
