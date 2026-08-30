@@ -57,8 +57,14 @@ export interface IHoliday {
   desc: string;
 }
 
+export interface ISettings {
+  fiscalYearStartDate: string;
+  defaultCurrency: string;
+}
+
 export interface IState {
   usr: IUsr;
+  settings: ISettings;
   currency: string;
   dateSeg: string;
   handles: IViewData[];

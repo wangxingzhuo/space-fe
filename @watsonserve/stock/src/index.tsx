@@ -8,6 +8,7 @@ import Header from './components/header';
 import('@/assets/style/index.styl');
 const App = lazy(() => import('@/pages/app'));
 const Records = lazy(() => import('@/pages/records'));
+const Settings = lazy(() => import('@/pages/settings'));
 
 function Root() {
   return (
@@ -18,6 +19,7 @@ function Root() {
           <Routes>
             <Route path="/" element={<App />} />
             <Route path="/records" element={<Records />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </BrowserRouter>
       </Store>

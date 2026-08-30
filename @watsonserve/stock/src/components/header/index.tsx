@@ -32,6 +32,8 @@ export default function Header() {
         return navigate('/');
       case 'records':
         return navigate('/records');
+      case 'settings':
+        return navigate('/settings');
       case 'add':
         return showRecordForm(true);
       default:
