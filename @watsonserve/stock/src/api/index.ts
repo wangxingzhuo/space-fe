@@ -1,4 +1,4 @@
-import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar } from '@/entities';
+import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar, IFiscalYearPeriod } from '@/entities';
 import { Method, request } from '@watsonserve/connector';
 
 export async function loadUsr() {
@@ -26,9 +26,9 @@ interface IHandle {
   fxs: Record<string, number>;
 }
 
-export async function loadHandles() {
+export async function loadHoldings() {
   const { data: body } = await request({
-    api: `${globalThis.location?.origin || ''}/api/handles`
+    api: `${globalThis.location?.origin || ''}/api/holdings`
   });
 
   const { stocks: _stocks, fxs } = (body as Record<string, IHandle>).data;
@@ -105,4 +105,31 @@ export async function loadCalendar() {
   }
 
   return Object.values(markets).flat().sort((a, b) => b.start - a.start);
+}
+
+export async function loadFiscalYearOptions() {
+  const { data: body } = await request({
+    api: `${globalThis.location?.origin || ''}/api/fiscal-year-options`
+  });
+  return (body as { data: IFiscalYearPeriod[] }).data;
+}
+
+export async function loadFiscalYear() {
+  const { data: body } = await request({
+    api: `${globalThis.location?.origin || ''}/api/fiscal-year`
+  });
+  return (body as { data: string }).data;
+}
+
+export async function saveFiscalYear(period: string): Promise<void> {
+  const { data: body } = await request({
+    api: `${globalThis.location?.origin || ''}/api/fiscal-year`,
+    method: Method.POST,
+    data: { period },
+    mode: 'same-origin',
+    credentials: 'include'
+  });
+
+  const { status, msg } = body as Record<string, any>;
+  return 200 === status ? undefined : Promise.reject(new Error(msg));
 }

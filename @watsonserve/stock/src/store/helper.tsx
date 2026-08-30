@@ -1,8 +1,8 @@
 import { useCallback, useReducer, useRef } from 'react';
-import { loadUsr, loadHandles as __loadHandles, loadRR, loadCalendar } from '@/api';
-import { ISettings, IROR, IState, ISumInfo, IViewData } from '@/entities';
+import { loadUsr, loadHoldings as __loadHoldings, loadRR, loadCalendar } from '@/api';
+import { IROR, IState, ISumInfo, IViewData } from '@/entities';
 import { comput } from '@/helpers/ror';
-import { loadSettings, saveSettings } from '@/helpers/settings';
+import { loadSettings } from '@/helpers/settings';
 
 interface IDetail {
   fxs: Record<string, number>;
@@ -16,42 +16,39 @@ class RInfoMgr {
   private __infoCache: Record<string, string> = {};
   private __totalDetails: Partial<IDetail> = {};
   private __lastDivDate = 0;
-  private __fiscalYearStartDate = '01-01';
   readonly tomorrow: number;
   readonly today: number;
-  private thisYear = 0;
-  private lastYear = 0;
+  protected _thisYear = 0;
+  protected _lastYear = 0;
 
-  constructor(fiscalYearStartDate = '01-01') {
+  constructor() {
     const now = new Date();
     const dayStamp = ~~(now.getTime() / 86400000);
     this.today = dayStamp * 86400;
     this.tomorrow = this.today + 86400;
-    this.setFiscalYearStartDate(fiscalYearStartDate);
   }
 
   setFiscalYearStartDate(fiscalYearStartDate: string) {
     const [month = '1', day = '1'] = String(fiscalYearStartDate).split('-');
     const startMonth = Math.max(1, Math.min(12, Number(month) || 1));
     const startDay = Math.max(1, Math.min(31, Number(day) || 1));
-    this.__fiscalYearStartDate = `${String(startMonth).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`;
     const now = new Date();
     const curYear = now.getUTCFullYear();
     const curMonth = now.getUTCMonth() + 1;
     const curDay = now.getUTCDate();
     const fiscalYear = curMonth > startMonth || (curMonth === startMonth && curDay >= startDay) ? curYear : curYear - 1;
-    this.thisYear = ~~(new Date(Date.UTC(fiscalYear, startMonth - 1, startDay)).getTime() / 1000);
-    this.lastYear = ~~(new Date(Date.UTC(fiscalYear - 1, startMonth - 1, startDay)).getTime() / 1000);
+    this._thisYear = ~~(new Date(Date.UTC(fiscalYear, startMonth - 1, startDay)).getTime() / 1000);
+    this._lastYear = ~~(new Date(Date.UTC(fiscalYear - 1, startMonth - 1, startDay)).getTime() / 1000);
     this.__rorCache = {};
     this.__infoCache = {};
   }
 
   protected getTimeSegment(tSeg: string): [number, number] {
-    const { thisYear, tomorrow, lastYear } = this;
-    return 'YTD' === tSeg ? [thisYear, tomorrow] : [lastYear, thisYear];
+    const { _thisYear, tomorrow, _lastYear } = this;
+    return 'YTD' === tSeg ? [_thisYear, tomorrow] : [_lastYear, _thisYear];
   }
 
-  async getRInfo(tag: string, currency: string) {
+  protected async getRInfo(tag: string, currency: string) {
     const info = this.__infoCache[`${tag}_${currency}`];
     if (info) return JSON.parse(info);
 
@@ -82,10 +79,10 @@ class RInfoMgr {
     } as ISumInfo;
   }
 
-  async loadHandles() {
+  async loadHoldings(currency: string = 'USD') {
     const today = this.today;
     const recently = today + 60 * 86400;
-    const [result, rInfo] = await Promise.all([__loadHandles(), this.getRInfo('YTD', 'USD')]);
+    const [result, rInfo] = await Promise.all([__loadHoldings(), this.getRInfo('YTD', currency)]);
     const { fxs, stocks: _stocks, totalUSDAsset, totalUSDCost } = result;
 
     const stocks: IViewData[] = [];
@@ -142,16 +139,15 @@ function comingDividends(stocks: IViewData[], recentlyDividends: any[], lastDivD
 }
 
 export function useData() {
-  const settingsRef = useRef(loadSettings());
-  const rInfoMgr = useRef(new RInfoMgr(settingsRef.current.fiscalYearStartDate));
+  const rInfoMgr = useRef(new RInfoMgr());
   const [state, dispatch] = useReducer(
     (prevState, payload) => ({ ...prevState, ...payload }),
     {
       usr: { name: '', avatar: '' },
-      settings: settingsRef.current,
       handles: [] as IViewData[],
       comingDivs: [],
-      currency: settingsRef.current.defaultCurrency,
+      fiscalYear: '',
+      currency: 'USD',
       dateSeg: 'YTD',
       sumInfo: {} as ISumInfo,
       holidays: [],
@@ -166,32 +162,17 @@ export function useData() {
   }, [state]);
 
   const initial = useCallback(async () => {
-    const { defaultCurrency } = settingsRef.current;
-    const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHandles();
+    const settings = await loadSettings();
+    const { currency, fiscalYear } = settings;
+    rInfoMgr.current.setFiscalYearStartDate(fiscalYear);
+    const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHoldings(currency);
     const comingDivs = comingDividends(stocks, recentlyDividends, lastDivDate);
 
     const resp = await fetch(`/category.json?ncs=${stocks.map(({ nc }) => nc).join(',')}`);
     const categoryDict = await resp.json();
 
-    dispatch({ handles: stocks, comingDivs, currency: defaultCurrency, dateSeg: 'YTD', sumInfo, categoryDict });
+    dispatch({ handles: stocks, comingDivs, currency, fiscalYear, dateSeg: 'YTD', sumInfo, categoryDict });
   }, []);
-
-  const updateSettings = useCallback(async (settings: ISettings) => {
-    const prevSettings = settingsRef.current;
-    settingsRef.current = settings;
-    saveSettings(settings);
-    const payload: Partial<IState> = { settings };
-
-    if (prevSettings.defaultCurrency !== settings.defaultCurrency) {
-      payload.currency = settings.defaultCurrency;
-    }
-    dispatch(payload);
-
-    if (prevSettings.fiscalYearStartDate !== settings.fiscalYearStartDate) {
-      rInfoMgr.current.setFiscalYearStartDate(settings.fiscalYearStartDate);
-      await initial();
-    }
-  }, [initial]);
 
   const loadUser = useCallback(() => {
     loadUsr().then(usr => usr && dispatch({ usr }));
@@ -229,5 +210,5 @@ export function useData() {
     dispatch({ holidays });
   }, []);
 
-  return { state, loadUser, initial, loadCalendarTips, changeGain, updateSettings };
+  return { state, loadUser, initial, loadCalendarTips, changeGain };
 }

@@ -58,13 +58,13 @@ export interface IHoliday {
 }
 
 export interface ISettings {
-  fiscalYearStartDate: string;
-  defaultCurrency: string;
+  fiscalYear: string;
+  currency: string;
 }
 
 export interface IState {
   usr: IUsr;
-  settings: ISettings;
+  fiscalYear: string;
   currency: string;
   dateSeg: string;
   handles: IViewData[];
@@ -125,6 +125,47 @@ export interface ICalendar {
   title: string;
   start: number;
   end: number;
+}
+
+// data: IFiscalYearPeriod[] = [
+// 	{
+// 		Code:      "JAN01_DEC31",
+// 		Name:      "Jan 01 - Dec 31",
+// 		StartMMDD: "01-01",
+// 		EndMMDD:   "12-31",
+// 		Economies: []string{"CN", "US", "CA", "JP", "SG", "DE", "FR"},
+// 	},
+// 	{
+// 		Code:      "APR01_MAR31",
+// 		Name:      "Apr 01 - Mar 31",
+// 		StartMMDD: "04-01",
+// 		EndMMDD:   "03-31",
+// 		Economies: []string{"IN", "HK", "NZ"},
+// 	},
+// 	{
+// 		Code:      "APR06_APR05",
+// 		Name:      "Apr 06 - Apr 05",
+// 		StartMMDD: "04-06",
+// 		EndMMDD:   "04-05",
+// 		Economies: []string{"UK"},
+// 	},
+// 	{
+// 		Code:      "JUL01_JUN30",
+// 		Name:      "Jul 01 - Jun 30",
+// 		StartMMDD: "07-01",
+// 		EndMMDD:   "06-30",
+// 		Economies: []string{"AU"},
+// 	},
+// ]
+export interface IFiscalYearPeriod {
+	code:      string;
+  name:      string;
+	startMMDD: string;
+}
+
+export interface IFiscalYearSettings {
+  selected: string;
+  periods: IFiscalYearPeriod[];
 }
 
 export class HandleStock implements IHandleStock {

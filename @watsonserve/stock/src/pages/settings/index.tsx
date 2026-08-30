@@ -1,55 +1,59 @@
 import { useEffect, useState } from 'react';
 import Button from '@watsonserve/ui/button';
-import { useStore } from '@/store';
+import Selector from '@watsonserve/ui/selector';
+import { type INameTitle } from '@watsonserve/ui/types';
+import { loadSettings, saveSettings } from '@/helpers/settings';
 import classes from './index.module.styl';
 
-const currencies = ['USD', 'HKD', 'SGD', 'CNY'];
-const fiscalYearOptions = [
-  { value: '01-01', label: '1月1日' },
-  { value: '04-01', label: '4月1日' },
-  { value: '04-05', label: '4月5日' },
-  { value: '07-01', label: '7月1日' }
-];
-
 export default function Settings() {
-  const { state, updateSettings } = useStore();
-  const [currency, setCurrency] = useState('USD');
-  const [fiscalYearStartDate, setFiscalYearStartDate] = useState('01-01');
   const [msg, setMsg] = useState('');
+  const [currency, setCurrency] = useState('USD');
+  const [fiscalYearStartDate, setFiscalYearStartDate] = useState('');
+  const [fiscalYearOptions, setFiscalYearOptions] = useState<INameTitle<string>[]>([]);
+  const [currencies, setCurrencies] = useState<string[]>([]);
 
-  useEffect(() => {
-    const { settings } = state;
-    if (!settings) return;
-    setCurrency(settings.defaultCurrency);
-    setFiscalYearStartDate(settings.fiscalYearStartDate);
-  }, [state.settings]);
+  const init = async () => {
+    const { supportedCurrencies, options, fiscalYear, currency } = await loadSettings();
+    setCurrency(currency);
+    setFiscalYearStartDate(fiscalYear);
+    setFiscalYearOptions(options);
+    setCurrencies(supportedCurrencies);
+  };
 
-  const handleSave = async () => {
-    await updateSettings({
-      defaultCurrency: currency,
-      fiscalYearStartDate
-    });
+  useEffect(() => { init() }, []);
+
+  const handleSave = async (ev: React.MouseEvent<HTMLButtonElement>) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    await saveSettings({ currency, fiscalYear: fiscalYearStartDate });
     setMsg('Saved');
   };
 
   return (
     <div className={`app ${classes.settings}`}>
       <h5 className={classes.title}>Settings</h5>
-      <div className={classes.form}>
-        <div className={classes.line}>
+      <form className={classes.form}>
+        <fieldset className={classes.line}>
           <label className={classes.label}>Default currency</label>
-          <select className={classes.select} value={currency} onChange={ev => setCurrency(ev.target.value)}>
-            {currencies.map(item => <option value={item} key={item}>{item}</option>)}
-          </select>
-        </div>
-        <div className={classes.line}>
+          <Selector
+            className={classes.select}
+            value={currency}
+            options={currencies.map(item => ({ name: item, title: item }))}
+            onInput={setCurrency}
+          />
+        </fieldset>
+        <fieldset className={classes.line}>
           <label className={classes.label}>Fiscal year starts in</label>
-          <select className={classes.select} value={fiscalYearStartDate} onChange={ev => setFiscalYearStartDate(ev.target.value)}>
-            {fiscalYearOptions.map(item => <option value={item.value} key={item.value}>{item.label}</option>)}
-          </select>
-        </div>
-        <Button type="submit" title="Save" onClick={handleSave} />
-      </div>
+          <Selector
+            className={classes.select}
+            value={fiscalYearStartDate}
+            options={fiscalYearOptions}
+            onInput={setFiscalYearStartDate}
+          />
+        </fieldset>
+        <Button type="primary" title="Save" onClick={handleSave} />
+      </form>
       {msg && <div className={classes.result}>{msg}</div>}
     </div>
   );
