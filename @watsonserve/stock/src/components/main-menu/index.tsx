@@ -19,6 +19,9 @@ export default function ContextMenu(props: IContextMenuProps) {
       name: isHome ? 'records' : 'home',
       title: isHome ? 'records' : 'home',
     }, {
+      name: 'settings',
+      title: 'settings',
+    }, {
       name: 'add',
       title: 'add',
       Icon: IconPlus
