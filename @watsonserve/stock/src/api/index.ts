@@ -81,10 +81,7 @@ export async function loadRecords(start: number, end: number): Promise<any[]> {
 }
 
 export async function loadCalendar() {
-  const { data: body } = await request({ api: `${globalThis.location?.origin || ''}/api/calendar` });
-
-  const { status, msg, data: list } = body as Record<string, any>;
-  if (200 !== status) return Promise.reject(new Error(msg));
+  const { data: list } = await request({ api: `${globalThis.location?.origin || ''}/api/calendar` });
 
   const markets: Record<string, ICalendar[]> = {};
 
@@ -111,7 +108,7 @@ export async function loadFiscalYearOptions() {
   const { data: body } = await request({
     api: `${globalThis.location?.origin || ''}/api/fiscal-year-options`
   });
-  return (body as { data: IFiscalYearPeriod[] }).data;
+  return body as IFiscalYearPeriod[];
 }
 
 export async function loadFiscalYear() {
