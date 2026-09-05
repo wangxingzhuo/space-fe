@@ -11,12 +11,12 @@ interface IDaily {
   amount: number;
 }
 
-function sliceByDate(divs: IDaily[], s: number, e: number) {
+function sliceByDate(divs: IDaily[], s: number, e: number) {  
   const sIdx = divs.findIndex(item => s < item.date);
   if (sIdx < 0) return [];
 
   divs = divs.slice(sIdx);
-  const eIdx = divs.findIndex(item => item.date <= e);
+  const eIdx = divs.findLastIndex(item => item.date <= e);
   if (eIdx < 0) return [];
 
   return divs.slice(0, eIdx+1);
@@ -111,19 +111,17 @@ export function comput(sTime: number, eTime: number, curr = 'USD', ror: IROR) {
     const dl = sliceByDate(dividend, prevDate, nextDate);
     const divi = dl.reduce((sum, item) => sum + item.amount, 0);
 
-    const close = new Decimal(prevClose);
-    const closeWithDivi = new Decimal(divi.toFixed(3)).add(close);
-    const open = new Decimal(nextOpen);
+    gain = new Decimal(prevClose).add(divi.toFixed(3)).mul(gain).div(nextOpen);
     // debugFoo.push(
     //   `${new Date(prevDate*1000).toJSON().substring(0, 10)}~${new Date(nextDate*1000).toJSON().substring(0, 10)} ${close.sub(open).toFixed(3)}`
     // );
-    gain = gain.mul(closeWithDivi).div(open);
   }
 
   // console.log(debugFoo.join('\n'));
   const progressOfYear = 365 / (~~(eTime / 86400) - sDay - 1);
   const twrr = +gain.sub(1).mul(100).toFixed(2);
-  const twrrForYear = twrr * progressOfYear;
+  
+  const twrrForYear = +gain.pow(progressOfYear).sub(1).mul(100).toFixed(2)
   const srrForYear = srr * progressOfYear;
   const xirr = +compXIRR(xir, new Decimal(1 + twrrForYear / 100)).sub(1).mul(100).toFixed(2);
 
