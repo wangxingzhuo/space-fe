@@ -120,7 +120,8 @@ export function comput(sTime: number, eTime: number, curr = 'USD', ror: IROR) {
   // console.log(debugFoo.join('\n'));
   const progressOfYear = 365 / (~~(eTime / 86400) - sDay - 1);
   const twrr = +gain.sub(1).mul(100).toFixed(2);
-  const twrrForYear = twrr * progressOfYear;
+  
+  const twrrForYear = +gain.pow(progressOfYear).sub(1).mul(100).toFixed(2)
   const srrForYear = srr * progressOfYear;
   const xirr = +compXIRR(xir, new Decimal(1 + twrrForYear / 100)).sub(1).mul(100).toFixed(2);
 
