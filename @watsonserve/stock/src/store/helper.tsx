@@ -104,6 +104,7 @@ class RInfoMgr {
     }
 
     this.__totalDetails = { fxs, totalDivTTM, totalUSDCost, totalUSDAsset };
+    const fx = fxs?.[currency] || 1;
 
     return {
       stocks,
@@ -111,9 +112,9 @@ class RInfoMgr {
       lastDivDate: this.__lastDivDate,
       sumInfo: {
         ...rInfo,
-        totalDivTTM,
-        totalCost: totalUSDCost,
-        totalAsset: totalUSDAsset,
+        totalDivTTM: totalDivTTM * fx,
+        totalCost: totalUSDCost * fx,
+        totalAsset: totalUSDAsset * fx,
       } as ISumInfo
     };
   }
