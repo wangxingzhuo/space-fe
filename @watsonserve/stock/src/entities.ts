@@ -38,18 +38,21 @@ export interface IViewData {
   date: number;
 }
 
-export interface ISumInfo {
+export interface ISummary {
+  realised: number;
+  unrealised: number;
+  allDividend: number;
+  twrr: number;
+  srr: number;
+  twrrForYear: number;
+  mwrrForYear: number;
+  srrForYear: number;
+}
+
+export interface ISumInfo extends ISummary {
   totalDivTTM: number;
   totalCost: number;
   totalAsset: number;
-  twrr: number;
-  unrealised: number;
-  allDivid: number;
-  twrrForYear: number;
-  xirr: number;
-  srr: number;
-  srrForYear: number;
-  realised: number;
 }
 
 export interface IHoliday {

@@ -14,8 +14,8 @@ export default function Summary(props: IProps) {
   const { dateSeg, currency, sumInfo, changeGain } = props;
   const {
     totalDivTTM = 0, totalCost = 0, totalAsset = 0,
-    unrealised = 0, allDivid = 0, realised = 0,
-    twrr = 0, twrrForYear = 0, xirr = 0, srr = 0, srrForYear = 0
+    unrealised = 0, allDividend = 0, realised = 0,
+    twrr = 0, twrrForYear = 0, mwrrForYear = 0, srr = 0, srrForYear = 0
   } = sumInfo;
 
   const list = useMemo(() => {
@@ -26,15 +26,15 @@ export default function Summary(props: IProps) {
       ['Dividend Yield (TTM)', `${(totalDivTTM / totalCost * 100).toFixed(2)}%`],
       ['Assets', `${curr} ${totalAsset.toLocaleString()}`],
 
-      ['Dividend (YTD)', `${curr} ${allDivid.toLocaleString()}`],
+      ['Dividend (YTD)', `${curr} ${allDividend.toLocaleString()}`],
       ['Unrealised (YTD)', `${curr} ${unrealised.toLocaleString()}`],
       ['Realised (YTD)', `${curr} ${realised.toLocaleString()}`],
 
       ['SRR (YTD / FY)', `${srr.toFixed(2)}% / ${srrForYear.toFixed(2)}%`],
-      ['MWRR (FY)', `${xirr.toFixed(2)}%`],
+      ['MWRR (FY)', `${mwrrForYear.toFixed(2)}%`],
       ['TWRR (YTD / FY)', `${twrr.toFixed(2)}% / ${twrrForYear.toFixed(2)}%`],
     ].filter(Boolean) as [string, string][];
-  }, [totalDivTTM, totalCost, totalAsset, twrr, unrealised, allDivid, twrrForYear, xirr, srrForYear]);
+  }, [totalDivTTM, totalCost, totalAsset, twrr, unrealised, allDividend, twrrForYear, mwrrForYear, srrForYear]);
 
   return (
     <>

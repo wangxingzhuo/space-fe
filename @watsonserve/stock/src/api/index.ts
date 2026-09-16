@@ -1,4 +1,4 @@
-import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar, IFiscalYearPeriod } from '@/entities';
+import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar, IFiscalYearPeriod, ISummary } from '@/entities';
 import { Method, request } from '@watsonserve/connector';
 
 export async function loadUsr() {
@@ -61,12 +61,33 @@ export async function recordAtrade(payload: ITade): Promise<void> {
   return 200 === status ? undefined : Promise.reject(new Error(msg));
 }
 
-export async function loadRR(start: number, end: number) {
+export interface ISummaryResp {
+  unrealised: number;
+  realised: number;
+  all_dividend: number;
+  twrr: number;
+  srr: number;
+  twrr_for_year: number;
+  srr_for_year: number;
+  mwrr_for_year: number;
+}
+
+export async function loadRR(currency: string, start: number, end: number) {
   const { data: body } = await request({
-    api: `${globalThis.location?.origin || ''}/api/capital?start=${start}&end=${end}`
+    api: `${globalThis.location?.origin || ''}/api/summary?currency=${currency}&start=${start}&end=${end}`
   });
 
-  return (body as any).data as IROR;
+  const {
+    unrealised: unrealised,
+    realised: realised,
+    all_dividend: allDividend,
+    twrr: twrr,
+    srr: srr,
+    twrr_for_year: twrrForYear,
+    srr_for_year: srrForYear,
+    mwrr_for_year: mwrrForYear,
+  } = (body as any).data as ISummaryResp;
+  return { unrealised, realised, allDividend, twrr, srr, twrrForYear, srrForYear, mwrrForYear } as ISummary;
 }
 
 export async function loadRecords(start: number, end: number): Promise<any[]> {

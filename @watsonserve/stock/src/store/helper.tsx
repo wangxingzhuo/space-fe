@@ -1,6 +1,6 @@
 import { useCallback, useReducer, useRef } from 'react';
-import { loadUsr, loadHoldings as __loadHoldings, loadRR, loadCalendar } from '@/api';
-import { IROR, IState, ISumInfo, IViewData } from '@/entities';
+import { loadUsr, loadHoldings as __loadHoldings, loadRR, loadCalendar, ISummaryResp } from '@/api';
+import { IROR, IState, ISumInfo, ISummary, IViewData } from '@/entities';
 import { comput } from '@/helpers/ror';
 import { loadSettings } from '@/helpers/settings';
 
@@ -11,9 +11,9 @@ interface IDetail {
   totalUSDAsset: number;
 }
 
+
 class RInfoMgr {
-  private __rorCache: Record<string, IROR> = {};
-  private __infoCache: Record<string, string> = {};
+  private __infoCache: Record<string, string> = {}; // ISummary
   private __totalDetails: Partial<IDetail> = {};
   private __lastDivDate = 0;
   readonly tomorrow: number;
@@ -39,7 +39,6 @@ class RInfoMgr {
     const fiscalYear = curMonth > startMonth || (curMonth === startMonth && curDay >= startDay) ? curYear : curYear - 1;
     this._thisYear = ~~(new Date(Date.UTC(fiscalYear, startMonth - 1, startDay)).getTime() / 1000);
     this._lastYear = ~~(new Date(Date.UTC(fiscalYear - 1, startMonth - 1, startDay)).getTime() / 1000);
-    this.__rorCache = {};
     this.__infoCache = {};
   }
 
@@ -52,18 +51,10 @@ class RInfoMgr {
     const info = this.__infoCache[`${tag}_${currency}`];
     if (info) return JSON.parse(info);
 
-    let ror = this.__rorCache[tag];
     const [start, end] = this.getTimeSegment(tag);
-    if (!ror) {
-      ror = await loadRR(start, end);
-      this.__rorCache[tag] = ror;
-    }
-    const { lastDivDate, ..._info } = comput(start, end, currency, ror);
-    this.__infoCache[`${tag}_${currency}`] = JSON.stringify(_info);
-    if (!this.__lastDivDate) {
-      this.__lastDivDate = lastDivDate;
-    }
-    return _info;
+    const summary = await loadRR(currency, start, end);
+    this.__infoCache[`${tag}_${currency}`] = JSON.stringify(summary);
+    return summary;
   }
 
   async getSumInfo(tag: string, currency: string) {
@@ -166,7 +157,8 @@ export function useData() {
     const settings = await loadSettings();
     const { currency, fiscalYear } = settings;
     rInfoMgr.current.setFiscalYearStartDate(fiscalYear);
-    const { stocks, recentlyDividends, lastDivDate, sumInfo } = await rInfoMgr.current.loadHoldings(currency);
+    const { stocks, recentlyDividends, lastDivDate: _lastDivDate, sumInfo } = await rInfoMgr.current.loadHoldings(currency);
+    let lastDivDate = _lastDivDate || ~~(new Date().getTime() / 1000);
     const comingDivs = comingDividends(stocks, recentlyDividends, lastDivDate);
 
     const resp = await fetch(`/category.json?ncs=${stocks.map(({ nc }) => nc).join(',')}`);
