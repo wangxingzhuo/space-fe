@@ -47,13 +47,18 @@ class RInfoMgr {
     return 'YTD' === tSeg ? [_thisYear, tomorrow] : [_lastYear, _thisYear];
   }
 
-  protected async getRInfo(tag: string, currency: string) {
+  protected async getRInfo(tag: string, currency: string): Promise<ISummary | undefined> {
     const info = this.__infoCache[`${tag}_${currency}`];
     if (info) return JSON.parse(info);
 
     const [start, end] = this.getTimeSegment(tag);
-    const summary = await loadRR(currency, start, end);
-    this.__infoCache[`${tag}_${currency}`] = JSON.stringify(summary);
+    let summary: ISummary | undefined = undefined;
+    try {
+      summary = await loadRR(currency, start, end);
+      this.__infoCache[`${tag}_${currency}`] = JSON.stringify(summary);
+    } catch (err) {
+      console.error(err);
+    }
     return summary;
   }
 
@@ -63,7 +68,7 @@ class RInfoMgr {
     const fx = fxs?.[currency] || 1;
 
     return {
-      ...rInfo,
+      ...(rInfo || {}),
       totalDivTTM: totalDivTTM * fx,
       totalCost: totalUSDCost * fx,
       totalAsset: totalUSDAsset * fx,
@@ -102,7 +107,7 @@ class RInfoMgr {
       recentlyDividends,
       lastDivDate: this.__lastDivDate,
       sumInfo: {
-        ...rInfo,
+        ...(rInfo || {}),
         totalDivTTM: totalDivTTM * fx,
         totalCost: totalUSDCost * fx,
         totalAsset: totalUSDAsset * fx,

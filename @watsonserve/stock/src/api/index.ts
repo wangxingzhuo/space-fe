@@ -31,14 +31,14 @@ export async function loadHoldings() {
     api: `${globalThis.location?.origin || ''}/api/holdings`
   });
 
-  const { stocks: _stocks, fxs } = (body as Record<string, IHandle>).data;
+  const { stocks: _stocks, fxs = {} } = (body as Record<string, IHandle>).data;
 
   let totalUSDAsset = 0;
   let totalUSDCost = 0;
   const stocks: HandleStock[] = [];
 
   for (const _st of _stocks) {
-    const st = new HandleStock(_st, fxs[_st.currency]);
+    const st = new HandleStock(_st, fxs?.[_st.currency] || 1);
     stocks.push(st);
     const { usdMarketValue, usdCost } = st;
     totalUSDAsset += usdMarketValue;
@@ -73,9 +73,13 @@ export interface ISummaryResp {
 }
 
 export async function loadRR(currency: string, start: number, end: number) {
-  const { data: body } = await request({
+  const { status, statusText, data: body } = await request({
     api: `${globalThis.location?.origin || ''}/api/summary?currency=${currency}&start=${start}&end=${end}`
   });
+
+  const { msg, data } = (body || {}) as { msg: string; data: ISummaryResp };
+  if (200 !== status || !body || !data)
+    return Promise.reject(new Error(msg || statusText || 'No data received'));
 
   const {
     unrealised: unrealised,
@@ -86,7 +90,8 @@ export async function loadRR(currency: string, start: number, end: number) {
     twrr_for_year: twrrForYear,
     srr_for_year: srrForYear,
     mwrr_for_year: mwrrForYear,
-  } = (body as any).data as ISummaryResp;
+  } = data;
+
   return { unrealised, realised, allDividend, twrr, srr, twrrForYear, srrForYear, mwrrForYear } as ISummary;
 }
 
