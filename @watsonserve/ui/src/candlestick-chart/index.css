@@ -1,0 +1,9 @@
+.ws-ui-candlestick-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ws-ui-candlestick-chart-empty {
+  min-height: 160px;
+}

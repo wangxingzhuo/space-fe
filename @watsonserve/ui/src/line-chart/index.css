@@ -1,0 +1,9 @@
+.ws-ui-line-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ws-ui-line-chart-empty {
+  min-height: 160px;
+}
