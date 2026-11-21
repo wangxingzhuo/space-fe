@@ -6,6 +6,12 @@ export enum EnTType {
   BALANCE=-1
 }
 
+export enum EnMarket {
+  US='USD',
+  SG='SGD',
+  HK='HKD'
+}
+
 export interface ITade {
   nc: string;
   cost: number;
