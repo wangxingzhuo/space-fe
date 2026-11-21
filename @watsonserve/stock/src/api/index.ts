@@ -1,4 +1,4 @@
-import { HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar, IFiscalYearPeriod, ISummary } from '@/entities';
+import { EnMarket, EnTType, HandleStock, IRedirect, IHandleStock, IUsr, ITade, IROR, ICalendar, IFiscalYearPeriod, ISummary } from '@/entities';
 import { Method, request } from '@watsonserve/connector';
 
 export async function loadUsr() {
@@ -95,15 +95,31 @@ export async function loadRR(currency: string, start: number, end: number) {
   return { unrealised, realised, allDividend, twrr, srr, twrrForYear, srrForYear, mwrrForYear } as ISummary;
 }
 
-export async function loadRecords(start: number, end: number): Promise<any[]> {
-  const { data: body } = await request({
+export async function loadRecords(
+  start: number,
+  end: number,
+  market: EnMarket | null = null,
+  tradeType: EnTType | null = null
+): Promise<ITade[] | null> {
+  const { status: responseStatus, statusText, data: body } = await request({
     api: `${globalThis.location?.origin || ''}/api/record`,
     method: Method.GET,
-    data: { start, end }
+    data: {
+      start,
+      end,
+      ...(null !== market ? { market } : {}),
+      ...(null !== tradeType ? { ttype: tradeType } : {})
+    }
   });
 
+  if (204 === responseStatus) return null;
+
   const { status, msg, data } = body as Record<string, any>;
-  return 200 === status ? data : Promise.reject(new Error(msg));
+  if (204 === status) return null;
+  if (200 !== responseStatus || 200 !== status || !Array.isArray(data)) {
+    return Promise.reject(new Error(msg || statusText || 'No data received'));
+  }
+  return data;
 }
 
 export async function loadCalendar() {
